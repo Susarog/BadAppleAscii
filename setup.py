@@ -1,4 +1,4 @@
-import PIL.Image
+import PIL.Image as Image
 import os
 import sys
 
@@ -23,22 +23,23 @@ def resize(image, new_width=50, new_height=25):
 
 
 def setup():
-    frames_images = sys.argv[1]
-    text_dir = frames_images + "/../text/"
+    image_dir = os.path.realpath(sys.argv[1])
+    parent_dir = os.path.abspath(os.path.join(image_dir, os.pardir))
+    text_dir = os.path.join(parent_dir, "text")
     os.makedirs(text_dir, exist_ok=True)
-    file_images = os.listdir(frames_images)
+    file_images = os.listdir(image_dir)
     sorted_filenames = sorted(file_images)
     for i in range(0, len(sorted_filenames)):
-        f = os.path.join(frames_images, sorted_filenames[i])
+        f = os.path.join(image_dir, sorted_filenames[i])
         if os.path.isfile(f):
-            image = PIL.Image.open(f)
+            image = Image.open(f)
             image = resize(image)
             image = to_greyscale(image)
             ascii_str = pixel_to_ascii(image)
             ascii_str_len = len(ascii_str)
             img_width = image.width
             ascii_img = ""
-            out_file = text_dir + "ascii_image" + str(i) + ".txt"
+            out_file = os.path.join(text_dir, "ascii_image" + str(i) + ".txt")
             for i in range(0, ascii_str_len, img_width):
                 ascii_img += ascii_str[i : i + img_width] + "\n"
                 with open(out_file, "w") as f:
